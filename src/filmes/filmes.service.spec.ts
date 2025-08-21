@@ -12,7 +12,7 @@ const mockPrisma = {
     update: jest.fn(),
     delete: jest.fn(),
   },
-};
+}; 
 
 // Suite de testes para FilmesService
 describe("FilmesService", () => {
