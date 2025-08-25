@@ -25,34 +25,35 @@ export class FilmesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Buscar um filme pelo ID' })
-  @ApiResponse({ status: 200, description: 'Filme encontrado.' })
-  @ApiResponse({ status: 404, description: 'Filme não deletado.' })
-  findOne(@Param('id') id: string) {
-    const filme = this.filmesService.findOne(Number(id));
-    if (!filme) throw new NotFoundException('Filme não encontrado');
-    return filme;
-  }
+@ApiOperation({ summary: 'Buscar um filme pelo ID' })
+@ApiResponse({ status: 200, description: 'Filme encontrado.' })
+@ApiResponse({ status: 404, description: 'Filme não encontrado.' })
+async findOne(@Param('id') id: string) {
+  const filme = await this.filmesService.findOne(Number(id));
+  if (!filme) throw new NotFoundException('Filme não encontrado');
+  return filme;
+}
 
-  @Put(':id')
-  @ApiOperation({ summary: 'Atualizar um filme pelo ID' })
-  @ApiResponse({ status: 200, description: 'Filme atualizado com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Filme não encontrado.' })
-  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
-  update(@Param('id') id: string, @Body() data: CreateFilmeDto) {
-    const filme = this.filmesService.findOne(Number(id));
-    if (!filme) throw new NotFoundException('Filme não encontrado');
-    return this.filmesService.update(Number(id), data);
-  }
+@Put(':id')
+@ApiOperation({ summary: 'Atualizar um filme pelo ID' })
+@ApiResponse({ status: 200, description: 'Filme atualizado com sucesso.' })
+@ApiResponse({ status: 404, description: 'Filme não encontrado.' })
+@ApiResponse({ status: 400, description: 'Dados inválidos.' })
+async update(@Param('id') id: string, @Body() data: CreateFilmeDto) {
+  const filme = await this.filmesService.findOne(Number(id));
+  if (!filme) throw new NotFoundException('Filme não encontrado');
+  return this.filmesService.update(Number(id), data);
+}
 
-  @Delete(':id')
-  @HttpCode(204)
-  @ApiOperation({ summary: 'Deletar um filme pelo ID' })
-  @ApiResponse({ status: 204, description: 'Filme deletado com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Filme não encontrado.' })
-  remove(@Param('id') id: string) {
-    const filme = this.filmesService.findOne(Number(id));
-    if (!filme) throw new NotFoundException('Filme não encontrado');
-    return this.filmesService.remove(Number(id));
-  }
+@Delete(':id')
+@HttpCode(204)
+@ApiOperation({ summary: 'Deletar um filme pelo ID' })
+@ApiResponse({ status: 204, description: 'Filme deletado com sucesso.' })
+@ApiResponse({ status: 404, description: 'Filme não encontrado.' })
+async remove(@Param('id') id: string) {
+  const filme = await this.filmesService.findOne(Number(id));
+  if (!filme) throw new NotFoundException('Filme não encontrado');
+  return this.filmesService.remove(Number(id));
+}
+
 }

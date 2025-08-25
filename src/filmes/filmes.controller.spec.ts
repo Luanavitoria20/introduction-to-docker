@@ -3,8 +3,7 @@ import { FilmesController } from './filmes.controller';
 import { FilmesService } from './filmes.service';
 import { NotFoundException } from '@nestjs/common';
 
-// aqui eu criei um serviço falso pra não precisar do banco
-const MockFilmesService = {
+const mockFilmesService = {
   create: jest.fn(),
   findAll: jest.fn(),
   findOne: jest.fn(),
@@ -14,68 +13,54 @@ const MockFilmesService = {
 
 describe('FilmesController', () => {
   let controller: FilmesController;
-  let service: FilmesService;
+
 
   beforeEach(async () => {
-    // monta o módulo de teste
+  
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FilmesController],
-      providers: [{ provide: FilmesService, useValue: MockFilmesService}],
+      providers: [
+        { provide: FilmesService, useValue: mockFilmesService },
+      ],
     }).compile();
 
     controller = module.get<FilmesController>(FilmesController);
-    service = module.get<FilmesService>(FilmesService);
+
   });
 
-  it('controller tem que existir', () => {
-    expect(controller).toBeDefined();
+  // Deve criar 
+  it('deve criar um filme', async () => {
+    const dto = { titulo: 'Matrix', ano: 1999 };
+    mockFilmesService.create.mockResolvedValue({ id: 1, ...dto });
+    expect(await controller.create(dto as any)).toEqual({ id: 1, ...dto });
   });
 
-  // teste de criar filme
-  it('criar um filme', async () => {
-    const dto = { titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
-    MockFilmesService.create.mockResolvedValue({ id: 1, ...dto });
-    const result = await controller.create(dto as any);
-    expect(result).toEqual({ id: 1, ...dto });
+  // Deve listar todos
+  it('deve listar todos os filmes', async () => {
+    const list = [{ id: 1, titulo: 'Matrix', ano: 1999 }];
+    mockFilmesService.findAll.mockResolvedValue(list);
+    expect(await controller.findAll()).toEqual(list);
   });
 
-  // listar todos
-  it('listar todos os filmes', async () => {
-    MockFilmesService.findAll.mockResolvedValue([
-      { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 },
-    ]);
-    expect(await controller.findAll()).toEqual([
-      { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 },
-    ]);
+  // Deve buscar pelo ID
+  it('deve buscar um filme por ID', async () => {
+    const filme = { id: 1, titulo: 'Matrix', ano: 1999 };
+    mockFilmesService.findOne.mockResolvedValue(filme);
+    expect(await controller.findOne('1')).toEqual(filme);
   });
 
-  // buscar por id
-  it('buscar um filme por id', async () => {
-    const filme = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
-    MockFilmesService.findOne.mockResolvedValue(filme);
-    const achado = await controller.findOne('1');
-    expect(achado).toEqual(filme);
-  });
-  
-  // atualizar
-  it('atualizar um filme', async () => {
-    const filmeOriginal = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
-    const filmeAtualizado = { id: 1, titulo: 'Matrix Reloaded', genero: 'ACAO', ano: 2003 };
-    MockFilmesService.findOne.mockResolvedValue(filmeOriginal);
-    MockFilmesService.update.mockResolvedValue(filmeAtualizado);
-
-    expect(await controller.update('1', { titulo: 'Matrix Reloaded', ano: 2003 } as any))
-      .toEqual(filmeAtualizado);
+  // Deve atualizar
+  it('deve atualizar um filme', async () => {
+    const updated = { id: 1, titulo: 'Matrix Reloaded', ano: 2003 };
+    mockFilmesService.update.mockResolvedValue(updated);
+    expect(await controller.update('1', { titulo: 'Matrix Reloaded', ano: 2003 } as any)).toEqual(updated);
   });
 
-  // remover
-  it('remover um filme', async () => {
-    const filme = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
-    MockFilmesService.findOne.mockResolvedValue(filme);
-    MockFilmesService.remove.mockResolvedValue(filme);
-
-    const removido = await controller.remove('1');
-    expect(removido).toEqual(filme);
+  // Deve remove
+  it('deve remover um filme', async () => {
+    const removed = { id: 1, titulo: 'Matrix', ano: 1999 };
+    mockFilmesService.remove.mockResolvedValue(removed);
+    expect(await controller.remove('1')).toEqual(removed);
   });
 
 
