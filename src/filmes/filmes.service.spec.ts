@@ -3,8 +3,8 @@ import { FilmesService } from "./filmes.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { NotFoundException } from "@nestjs/common";
 
-// Mock do PrismaService
-const mockPrisma = {
+// fake do Prisma só pra enganar no teste
+const fakePrisma = {
   filme: {
     create: jest.fn(),
     findMany: jest.fn(),
@@ -14,70 +14,75 @@ const mockPrisma = {
   },
 };
 
-// Suite de testes para FilmesService
 describe("FilmesService", () => {
   let service: FilmesService;
 
-  // Criar instância do service antes de cada teste
   beforeEach(async () => {
+    // aqui monta o módulo mas usando o fake em vez do banco
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         FilmesService,
-        { provide: PrismaService, useValue: mockPrisma },
+        { provide: PrismaService, useValue: fakePrisma },
       ],
     }).compile();
 
     service = module.get<FilmesService>(FilmesService);
   });
 
-  // Teste de criação
-  it("deve criar um filme", async () => {
+  // criar filme
+  it("criar filme", async () => {
     const dto = { titulo: "Matrix", ano: 1999 };
-    mockPrisma.filme.create.mockResolvedValue({ id: 1, ...dto });
+    fakePrisma.filme.create.mockResolvedValue({ id: 1, ...dto });
 
-    const result = await service.create(dto as any);
-    expect(result).toEqual({ id: 1, ...dto });
-    expect(mockPrisma.filme.create).toHaveBeenCalledWith({ data: dto });
+    const criado = await service.create(dto as any);
+    expect(criado).toEqual({ id: 1, ...dto });
+    // só pra conferir se chamou certo
+    expect(fakePrisma.filme.create).toHaveBeenCalledWith({ data: dto });
   });
 
-  // Teste de listagem
-  it("deve listar todos os filmes", async () => {
-    const filmes = [{ id: 1, titulo: "Matrix", ano: 1999 }];
-    mockPrisma.filme.findMany.mockResolvedValue(filmes);
+  // listar
+  it("listar filmes", async () => {
+    const lista = [{ id: 1, titulo: "Matrix", ano: 1999 }];
+    fakePrisma.filme.findMany.mockResolvedValue(lista);
 
-    expect(await service.findAll()).toEqual(filmes);
+    const result = await service.findAll();
+    expect(result).toEqual(lista);
   });
 
-  // Teste de busca por id
-  it("deve retornar um filme por ID", async () => {
+  // buscar por id
+  it("buscar por id", async () => {
     const filme = { id: 1, titulo: "Matrix", ano: 1999 };
-    mockPrisma.filme.findUnique.mockResolvedValue(filme);
+    fakePrisma.filme.findUnique.mockResolvedValue(filme);
 
-    expect(await service.findOne(1)).toEqual(filme);
+    const achado = await service.findOne(1);
+    expect(achado).toEqual(filme);
   });
 
-  // Teste de erro quando não encontrado
-  it("deve lançar erro se filme não encontrado", async () => {
-    mockPrisma.filme.findUnique.mockResolvedValue(null);
+  // quando não acha
+  it("erro se nao achar filme", async () => {
+    fakePrisma.filme.findUnique.mockResolvedValue(null);
 
-    await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+    return expect(service.findOne(999)).rejects.toThrow(NotFoundException);
   });
 
-  // Teste de atualização
-  it("deve atualizar um filme", async () => {
-    const updated = { id: 1, titulo: "Matrix Reloaded", ano: 2003 };
-    mockPrisma.filme.findUnique.mockResolvedValue({ id: 1, titulo: "Matrix", ano: 1999 });
-    mockPrisma.filme.update.mockResolvedValue(updated);
+  // atualizar
+  it("atualizar filme", async () => {
+    const filmeVelho = { id: 1, titulo: "Matrix", ano: 1999 };
+    const filmeNovo = { id: 1, titulo: "Matrix Reloaded", ano: 2003 };
+    fakePrisma.filme.findUnique.mockResolvedValue(filmeVelho);
+    fakePrisma.filme.update.mockResolvedValue(filmeNovo);
 
-    expect(await service.update(1, { titulo: "Matrix Reloaded", ano: 2003 })).toEqual(updated);
+    const atualizado = await service.update(1, { titulo: "Matrix Reloaded", ano: 2003 });
+    expect(atualizado).toEqual(filmeNovo);
   });
 
-  // Teste de remoção
-  it("deve remover um filme", async () => {
-    const removed = { id: 1, titulo: "Matrix", ano: 1999 };
-    mockPrisma.filme.findUnique.mockResolvedValue(removed);
-    mockPrisma.filme.delete.mockResolvedValue(removed);
+  // remover
+  it("remover filme", async () => {
+    const filme = { id: 1, titulo: "Matrix", ano: 1999 };
+    fakePrisma.filme.findUnique.mockResolvedValue(filme);
+    fakePrisma.filme.delete.mockResolvedValue(filme);
 
-    expect(await service.remove(1)).toEqual(removed);
+    const removido = await service.remove(1);
+    expect(removido).toEqual(filme);
   });
-})
+});
