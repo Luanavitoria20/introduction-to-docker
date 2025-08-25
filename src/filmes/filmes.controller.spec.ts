@@ -3,7 +3,8 @@ import { FilmesController } from './filmes.controller';
 import { FilmesService } from './filmes.service';
 import { NotFoundException } from '@nestjs/common';
 
-const mockFilmesService = {
+// aqui eu criei um serviço falso pra não precisar do banco
+const MockFilmesService = {
   create: jest.fn(),
   findAll: jest.fn(),
   findOne: jest.fn(),
@@ -13,55 +14,86 @@ const mockFilmesService = {
 
 describe('FilmesController', () => {
   let controller: FilmesController;
-
+  let service: FilmesService;
 
   beforeEach(async () => {
-  
+    // monta o módulo de teste
     const module: TestingModule = await Test.createTestingModule({
       controllers: [FilmesController],
-      providers: [
-        { provide: FilmesService, useValue: mockFilmesService },
-      ],
+      providers: [{ provide: FilmesService, useValue: MockFilmesService }],
     }).compile();
 
     controller = module.get<FilmesController>(FilmesController);
-
+    service = module.get<FilmesService>(FilmesService);
   });
 
-  // Deve criar 
-  it('deve criar um filme', async () => {
-    const dto = { titulo: 'Matrix', ano: 1999 };
-    mockFilmesService.create.mockResolvedValue({ id: 1, ...dto });
-    expect(await controller.create(dto as any)).toEqual({ id: 1, ...dto });
+  it('controller tem que existir', () => {
+    expect(controller).toBeDefined();
   });
 
-  // Deve listar todos
-  it('deve listar todos os filmes', async () => {
-    const list = [{ id: 1, titulo: 'Matrix', ano: 1999 }];
-    mockFilmesService.findAll.mockResolvedValue(list);
-    expect(await controller.findAll()).toEqual(list);
+  // teste de criar filme
+  it('criar um filme', async () => {
+    const dto = { titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
+    MockFilmesService.create.mockResolvedValue({ id: 1, ...dto });
+    const result = await controller.create(dto as any);
+    expect(result).toEqual({ id: 1, ...dto });
   });
 
-  // Deve buscar pelo ID
-  it('deve buscar um filme por ID', async () => {
-    const filme = { id: 1, titulo: 'Matrix', ano: 1999 };
-    mockFilmesService.findOne.mockResolvedValue(filme);
-    expect(await controller.findOne('1')).toEqual(filme);
+  // listar todos
+  it('listar todos os filmes', async () => {
+    MockFilmesService.findAll.mockResolvedValue([
+      { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 },
+    ]);
+    expect(await controller.findAll()).toEqual([
+      { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 },
+    ]);
   });
 
-  // Deve atualizar
-  it('deve atualizar um filme', async () => {
-    const updated = { id: 1, titulo: 'Matrix Reloaded', ano: 2003 };
-    mockFilmesService.update.mockResolvedValue(updated);
-    expect(await controller.update('1', { titulo: 'Matrix Reloaded', ano: 2003 } as any)).toEqual(updated);
+  // buscar por id
+  it('buscar um filme por id', async () => {
+    const filme = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
+    MockFilmesService.findOne.mockResolvedValue(filme);
+    const achado = await controller.findOne('1');
+    expect(achado).toEqual(filme);
   });
 
-  // Deve remove
-  it('deve remover um filme', async () => {
-    const removed = { id: 1, titulo: 'Matrix', ano: 1999 };
-    mockFilmesService.remove.mockResolvedValue(removed);
-    expect(await controller.remove('1')).toEqual(removed);
+  it('quando nao acha o filme deve dar erro', async () => {
+    MockFilmesService.findOne.mockResolvedValue(null);
+    return expect(controller.findOne('999')).rejects.toThrow(NotFoundException);
   });
 
+  // atualizar
+  it('atualizar um filme', async () => {
+    const filmeOriginal = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
+    const filmeAtualizado = { id: 1, titulo: 'Matrix Reloaded', genero: 'ACAO', ano: 2003 };
+    MockFilmesService.findOne.mockResolvedValue(filmeOriginal);
+    MockFilmesService.update.mockResolvedValue(filmeAtualizado);
 
+    expect(await controller.update('1', { titulo: 'Matrix Reloaded', ano: 2003 } as any))
+      .toEqual(filmeAtualizado);
+  });
+
+  it('erro ao tentar atualizar filme que nao existe', async () => {
+    MockFilmesService.findOne.mockResolvedValue(null);
+    const dto = { titulo: 'Teste' };
+    await expect(controller.update('999', dto as any)).rejects.toThrow(NotFoundException);
+  });
+
+  // remover
+  it('remover um filme', async () => {
+    const filme = { id: 1, titulo: 'Matrix', genero: 'ACAO', ano: 1999 };
+    MockFilmesService.findOne.mockResolvedValue(filme);
+    MockFilmesService.remove.mockResolvedValue(filme);
+
+    const removido = await controller.remove('1');
+    expect(removido).toEqual(filme);
+  });
+
+  it('nao deve remover se nao achar', async () => {
+    MockFilmesService.findOne.mockResolvedValue(null);
+    return expect(controller.remove('999')).rejects.toThrow(NotFoundException);
+  });
+
+  
 });
+ 
