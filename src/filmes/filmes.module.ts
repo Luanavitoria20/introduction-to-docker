@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { FilmesController } from './filmes.controller';
+import { FilmesController } from './FilmesController';
 import { FilmesService } from './filmes.service';
 import { PrismaModule } from '../prisma/prisma.module';
 
@@ -8,4 +8,4 @@ import { PrismaModule } from '../prisma/prisma.module';
   controllers: [FilmesController],
   providers: [FilmesService],
 })
-export class FilmesModule {}
+export class FilmesModule { }

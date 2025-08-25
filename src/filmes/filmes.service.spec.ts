@@ -12,7 +12,7 @@ const fakePrisma = {
     update: jest.fn(),
     delete: jest.fn(),
   },
-};
+}; 
 
 describe("FilmesService", () => {
   let service: FilmesService;
