@@ -24,13 +24,23 @@ export class FilmesController {
     return this.filmesService.findAll();
   }
 
+<<<<<<< HEAD
   @Get(':id')
+=======
+@Get(':id')
+>>>>>>> origin/main
 @ApiOperation({ summary: 'Buscar um filme pelo ID' })
 @ApiResponse({ status: 200, description: 'Filme encontrado.' })
 @ApiResponse({ status: 404, description: 'Filme não encontrado.' })
 async findOne(@Param('id') id: string) {
   const filme = await this.filmesService.findOne(Number(id));
+<<<<<<< HEAD
   if (!filme) throw new NotFoundException('Filme não encontrado');
+=======
+  if (!filme) {
+    throw new NotFoundException('Filme não encontrado');
+  }
+>>>>>>> origin/main
   return filme;
 }
 
@@ -41,7 +51,13 @@ async findOne(@Param('id') id: string) {
 @ApiResponse({ status: 400, description: 'Dados inválidos.' })
 async update(@Param('id') id: string, @Body() data: CreateFilmeDto) {
   const filme = await this.filmesService.findOne(Number(id));
+<<<<<<< HEAD
   if (!filme) throw new NotFoundException('Filme não encontrado');
+=======
+  if (!filme) {
+    throw new NotFoundException('Filme não encontrado');
+  }
+>>>>>>> origin/main
   return this.filmesService.update(Number(id), data);
 }
 
@@ -52,7 +68,13 @@ async update(@Param('id') id: string, @Body() data: CreateFilmeDto) {
 @ApiResponse({ status: 404, description: 'Filme não encontrado.' })
 async remove(@Param('id') id: string) {
   const filme = await this.filmesService.findOne(Number(id));
+<<<<<<< HEAD
   if (!filme) throw new NotFoundException('Filme não encontrado');
+=======
+  if (!filme) {
+    throw new NotFoundException('Filme não encontrado');
+  }
+>>>>>>> origin/main
   return this.filmesService.remove(Number(id));
 }
 
