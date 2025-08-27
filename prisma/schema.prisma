@@ -29,3 +29,17 @@ model Filme {
   genero Genero
   ano    Int
 }
+
+model User{
+  id String @id @default(uuid()) //Int @id @default(autoincrement())=String(uuid()) npx prisma migrate dev --name change id
+  name String
+  email String @unique
+  password String?
+  googleId String? @unique
+  role UserRole @default(COMUM)
+} 
+
+enum UserRole{
+  ADMIN
+  COMUM
+} 
