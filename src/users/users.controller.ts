@@ -10,8 +10,10 @@ import { ComumGuard } from "../auth/comum.guard";
 
 
 @ApiTags('users')
+
 @UseGuards(JwtAuthGuard)
 @UseGuards(ComumGuard)
+
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
