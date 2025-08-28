@@ -11,25 +11,25 @@ import { User } from '@prisma/client';
 export class AuthService {
 
     constructor(
-        private jwt: JwtService, 
+        private jwt: JwtService,
         private prisma: PrismaService
-    ){}
+    ) { }
 
     async registerUser(userData: RegisterUserDto) {
         const userExists = await this.prisma.user.findUnique({
-            where: {email: userData.email}
+            where: { email: userData.email }
         })
 
-        if(userExists){
+        if (userExists) {
             throw new ConflictException("Email já  está em uso!")
         }
 
-        const  hashedPassword = await bcrypt.hash(
+        const hashedPassword = await bcrypt.hash(
             userData.password, 10
         )
 
         const newUser = await this.prisma.user.create({
-            data:{
+            data: {
                 name: userData.name,
                 email: userData.email,
                 password: hashedPassword
@@ -45,18 +45,18 @@ export class AuthService {
         return newUser;
     }
 
-    async validateUser(email: string, password:string){
-        const user = await this.prisma.user.findUnique({where:{email}})
-        if(!user) throw new UnauthorizedException('Credenciais inválidas! email')
+    async validateUser(email: string, password: string) {
+        const user = await this.prisma.user.findUnique({ where: { email } })
+        if (!user) throw new UnauthorizedException('Credenciais inválidas! email')
 
-        if(!user.password) throw new UnauthorizedException(
+        if (!user.password) throw new UnauthorizedException(
             'Usuário não possui senha definida()Logar com o Google'
         )
 
         const isMatch = await bcrypt.compare(password, user.password)
-        if(!isMatch) throw new UnauthorizedException('Credenciais inválidas! senha')
+        if (!isMatch) throw new UnauthorizedException('Credenciais inválidas! senha')
         return user;
-    } 
+    }
 
     async login(Credencials: LoginDto) {
         const user = await this.validateUser(
@@ -70,19 +70,19 @@ export class AuthService {
             role: user.role
         }
 
-        return{
-            access_token:this.jwt.sign(payload)
+        return {
+            access_token: this.jwt.sign(payload)
         }
 
     }
 
-    async findOrCreateGoogleUser({googleId, email, name}){
-        
+    async findOrCreateGoogleUser({ googleId, email, name }) {
+
         let user = await this.prisma.user.findUnique({
-            where: {googleId}
+            where: { googleId }
         });
 
-        if(!user)  {
+        if (!user) {
             user = await this.prisma.user.create({
                 data: {
                     email,
@@ -104,5 +104,5 @@ export class AuthService {
         return this.jwt.sign(payload)
     }
 
-    
+
 }

@@ -1,9 +1,13 @@
-import { Controller, Post, Body, Get, Param, NotFoundException, Put, Delete, HttpCode } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Post, Body, Get, Param, NotFoundException, Put, Delete, HttpCode, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateFilmeDto } from './dto/create-filme.dto';
 import { FilmesService } from './filmes.service';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { ComumGuard } from 'src/auth/comum.guard';
 
-
+@UseGuards(ComumGuard)
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 @ApiTags('Filmes')
 @Controller('filmes')
 export class FilmesController {
