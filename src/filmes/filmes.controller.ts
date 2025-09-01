@@ -2,8 +2,8 @@ import { Controller, Post, Body, Get, Param, NotFoundException, Put, Delete, Htt
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CreateFilmeDto } from './dto/create-filme.dto';
 import { FilmesService } from './filmes.service';
-import { JwtAuthGuard } from 'src/auth/jwt.guard';
-import { ComumGuard } from 'src/auth/comum.guard';
+import { JwtAuthGuard } from '../auth/jwt.guard';
+import { ComumGuard } from '../auth/comum.guard';
 
 @UseGuards(ComumGuard)
 @UseGuards(JwtAuthGuard)

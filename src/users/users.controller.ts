@@ -4,13 +4,13 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/create-user.dto';
 import { ApiBearerAuth, ApiBody, ApiOperation, ApiResponse, ApiTags, ApiParam } from "@nestjs/swagger";
 import { JwtAuthGuard } from "../auth/jwt.guard";
-import { ComumGuard } from "../auth/comum.guard";
-import { AdminGuard } from "src/auth/admin.guard";
+import { AdminGuard } from "../auth/admin.guard";
 
 
 @ApiTags('users')
 @UseGuards(AdminGuard)
 @UseGuards(JwtAuthGuard)
+
 @ApiBearerAuth()
 @Controller('users')
 export class UsersController {
