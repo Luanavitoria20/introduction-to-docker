@@ -4,8 +4,9 @@ import { CreateFilmeDto } from './dto/create-filme.dto';
 import { FilmesService } from './filmes.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { ComumGuard } from '../auth/comum.guard';
+import { AdminGuard } from '../auth/admin.guard';
 
-@UseGuards(ComumGuard)
+
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 @ApiTags('Filmes')
@@ -13,6 +14,8 @@ import { ComumGuard } from '../auth/comum.guard';
 export class FilmesController {
     constructor(private readonly filmesService: FilmesService) { }
 
+
+    @UseGuards(AdminGuard)
     @Post()
     @ApiOperation({ summary: 'Criar um novo filme' })
     @ApiResponse({ status: 201, description: 'Filme criado com sucesso.' })
@@ -21,6 +24,7 @@ export class FilmesController {
         return this.filmesService.create(data);
     }
 
+    @UseGuards(ComumGuard)
     @Get()
     @ApiOperation({ summary: 'Listar todos os filmes' })
     @ApiResponse({ status: 200, description: 'Lista de filmes retornada com sucesso.' })
@@ -30,6 +34,7 @@ export class FilmesController {
     }
 
 
+    @UseGuards(ComumGuard)
     @Get(':id')
 
     @ApiOperation({ summary: 'Buscar um filme pelo ID' })
@@ -43,6 +48,7 @@ export class FilmesController {
         return filme;
     }
 
+    @UseGuards(AdminGuard)
     @Put(':id')
     @ApiOperation({ summary: 'Atualizar um filme pelo ID' })
     @ApiResponse({ status: 200, description: 'Filme atualizado com sucesso.' })
@@ -56,6 +62,7 @@ export class FilmesController {
         return this.filmesService.update(Number(id), data);
     }
 
+    @UseGuards(AdminGuard)
     @Delete(':id')
     @HttpCode(204)
     @ApiOperation({ summary: 'Deletar um filme pelo ID' })
