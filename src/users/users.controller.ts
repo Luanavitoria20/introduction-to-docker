@@ -10,14 +10,14 @@ import { ComumGuard } from "../auth/comum.guard";
 
 @ApiTags('Users')
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, AdminGuard)
 
 @ApiBearerAuth()
 @Controller('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  @UseGuards(ComumGuard)
+  
   @Post() // Rota Cria Usuário
   @ApiOperation({ summary: 'Criar um novo usuário' })
   @ApiBody({ type: CreateUserDto })
@@ -28,7 +28,7 @@ export class UsersController {
     return this.usersService.create(data);
   }
   
-  @UseGuards(AdminGuard)
+ 
   @Get() // Lista todos os usuários
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiResponse({
@@ -39,7 +39,7 @@ export class UsersController {
     return this.usersService.findAll()
   }
 
-  @UseGuards(ComumGuard)
+ 
   @Get(':id')  // Buscar o usuario pelo ID
   @ApiOperation({ summary: 'Buscar um usuário por ID' })
   @ApiResponse({
@@ -58,7 +58,7 @@ export class UsersController {
     return this.usersService.findOne(id)
   }
 
-  @UseGuards(AdminGuard)
+  
   @Put(':id') // atualizar um usuário
   @ApiOperation({ summary: 'Atualizar um usuário' })
   @ApiResponse({
@@ -74,7 +74,7 @@ export class UsersController {
     return this.usersService.update(id, data)
   }
 
-  @UseGuards(AdminGuard)
+
   @Delete(':id') // remove 
   @ApiOperation({ summary: 'Remover um usuário' })
   @ApiResponse({

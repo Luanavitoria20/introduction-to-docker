@@ -24,7 +24,7 @@ export class FilmesController {
         return this.filmesService.create(data);
     }
 
-    @UseGuards(ComumGuard)
+   
     @Get()
     @ApiOperation({ summary: 'Listar todos os filmes' })
     @ApiResponse({ status: 200, description: 'Lista de filmes retornada com sucesso.' })
@@ -34,7 +34,6 @@ export class FilmesController {
     }
 
 
-    @UseGuards(ComumGuard)
     @Get(':id')
 
     @ApiOperation({ summary: 'Buscar um filme pelo ID' })
