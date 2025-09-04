@@ -8,12 +8,12 @@ import { AdminGuard } from "../auth/admin.guard";
 import { ComumGuard } from "../auth/comum.guard";
 
 
-@ApiTags('users')
+@ApiTags('Users')
 
 @UseGuards(JwtAuthGuard)
 
 @ApiBearerAuth()
-@Controller('users')
+@Controller('Users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
